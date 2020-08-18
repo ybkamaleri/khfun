@@ -61,6 +61,7 @@ require(readxl)
 library(here)
 library(glue)
 library(logger)
+## library(crayon)
 
 ## Create folders for test
 library(fs)
@@ -545,19 +546,23 @@ ListAlleOriginalFiler<-function(globs=FinnGlobs()){
 
 ## OBS! Add tesfil=FALSE for selecting file for testing
 
-LagFilgruppe<-function(gruppe,batchdate=SettKHBatchDate(),globs=FinnGlobs(),diagnose=0,printR=TRUE,printCSV=FALSE,printSTATA=FALSE,versjonert=FALSE,dumps=list(),testfil = FALSE, DBtest = FALSE){
+LagFilgruppe<-function(gruppe,batchdate=SettKHBatchDate(),globs=FinnGlobs(),diagnose=0,printR=TRUE,printCSV=FALSE,printSTATA=FALSE,versjonert=FALSE,dumps=list(),testfil = FALSE){
 
-  ## testfil is TRUE when column 'TESTING' is used for selecting the file to be processed
-  ## DBtest - FALSE to use test Path for saveRDS.
+  ## testfil is TRUE when column 'TESTING' in ORIGINALFILER is used
+  ## for selecting the file to be processed
+
+  ## To see which DB is currently used
+  message("-----------------------\n  Database: ",
+          globs$KHdbname,
+          "\n  DB path:  ",
+          globs$path,
+          "\n-----------------------\n")
+
 
   ##Essensielt bare loop over alle delfiler/orignalfiler
   ##For hver orignalfil kj?res LagTabellFraFil
   ##Stables til tabellen FG
   ##Finn filgruppeparametre
-
-  message("Database: ", globs$KHdbname, "\nDB path: ", globs$path)
-
-
 
   ## FUN01
   ## -----
@@ -590,11 +595,6 @@ LagFilgruppe<-function(gruppe,batchdate=SettKHBatchDate(),globs=FinnGlobs(),diag
 
         ## For testing file path to Original File
         if (isTRUE(testfil)){getSti <- originalPath}
-
-        ## ## use original Access DB when not in runtest
-        ## ## this is needed when KHfunction.R is in different folder
-        ## ## Default is KHfunction is in the PRODUKSJON folder
-        ## if (isFALSE(DBtest)) {getSti <- originalPath}
 
         ## read row by row in delfiler
         filbesk<-delfiler[i,]
