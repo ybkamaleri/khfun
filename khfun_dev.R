@@ -109,7 +109,7 @@ defpaths <- switch(test,
 ## Database filename
 filDB <- switch(test,
                 "Nei" = "KHELSA.mdb",
-                "Ja" = "KHELSA_dev.mdb")
+                "Ja" = "KHELSA_dev.accdb")
 
 
 ## BIG TROUBLE!!! Watch out when setting up path. Too many 'setwd()' are used!
@@ -754,7 +754,7 @@ LagFilgruppe<-function(gruppe,batchdate=SettKHBatchDate(),globs=FinnGlobs(),diag
   }
 
 ## Make silently and not printing all the tables!!
-  invisible(return(Filgruppe))
+  invisible(Filgruppe)
 }
 
 
@@ -1319,7 +1319,7 @@ LagTabellFraFil<-function (filbesk,FGP,batchdate=SettKHBatchDate(),diagnose=0,gl
     #DF<-DF[0,] #Fungerer ikke mht class, som kan v?re feil
   }
 
-  invisible(return(DF))
+  invisible(DF)
 }
 
 #
@@ -2665,7 +2665,7 @@ SetBuffer<-function(filer=c("BEFOLK"),globs=FinnGlobs()){
       print(fil$err)
     }
   }
-  invisible(return(BUFFER))
+  invisible(BUFFER)
 }
 
 
