@@ -49,7 +49,7 @@ require(foreign) #Brukes ved lesing av SPSS, dBF
 ##require(gdata)  #Brukes ved lesing av xls/xlsx filer
 require(sas7bdat) #brukes ved lesing av SAS filer
 require(XML)
-require(reshape2)  #melt brukes til wide->long
+## require(reshape2)  #melt brukes til wide->long
 require(zoo)  #na.locf for ? sette inn for NA i innrykket originaltabulering
 require(plyr)  #mapvalues for omkoding
 require(sqldf)
@@ -555,6 +555,10 @@ LagFilgruppe<-function(gruppe,batchdate=SettKHBatchDate(),globs=FinnGlobs(),diag
   ##Stables til tabellen FG
   ##Finn filgruppeparametre
 
+  message("Database: ", globs$KHdbname, "\nDB path: ", globs$path)
+
+
+
   ## FUN01
   ## -----
   FGP<-FinnFilgruppeParametre(gruppe,batchdate=batchdate,globs=globs)
@@ -987,6 +991,7 @@ LagTabellFraFil<-function (filbesk,FGP,batchdate=SettKHBatchDate(),diagnose=0,gl
     cat("\nETTER TRINN3\n#############################\n")
     print(head(DF))
   }
+
   TilFilLogg(filbesk$KOBLID,"INNLES_OK",ok,batchdate=batchdate,globs=globs)
 
 
@@ -2536,27 +2541,7 @@ FinnFilBeskGruppe<-function(filgruppe,batchdate=NULL,globs=FinnGlobs(), ...){
   }
 
 
-
-  ## Picking up files path that is refered to in INNLESSING
-  ## --------------------------------------------------------
-  if (isTRUE(extArg$testfil)) {
-
-    sqlt<-paste("SELECT KOBLID, ORIGINALFILER.FILID AS FILID, FILNAVN, FORMAT, DEFAAR, INNLESING.*
-              FROM INNLESING INNER JOIN
-              (  ORGINNLESkobl INNER JOIN ORIGINALFILER
-              ON ORGINNLESkobl.FILID = ORIGINALFILER.FILID)
-              ON   (INNLESING.DELID = ORGINNLESkobl.DELID)
-              AND (INNLESING.FILGRUPPE = ORGINNLESkobl.FILGRUPPE)
-              WHERE INNLESING.FILGRUPPE='",filgruppe,"'
-              AND TESTING = 1
-              AND ORIGINALFILER.IBRUKFRA<=",datef,"
-              AND ORIGINALFILER.IBRUKTIL>", datef,"
-              AND INNLESING.VERSJONFRA<=",datef,"
-              AND INNLESING.VERSJONTIL>",datef,sep=""
-              )
-  } else {
-
-    sqlt<-paste("SELECT KOBLID, ORIGINALFILER.FILID AS FILID, FILNAVN, FORMAT, DEFAAR, INNLESING.*
+  sqlt<-paste("SELECT KOBLID, ORIGINALFILER.FILID AS FILID, FILNAVN, FORMAT, DEFAAR, TESTING, INNLESING.*
               FROM INNLESING INNER JOIN
               (  ORGINNLESkobl INNER JOIN ORIGINALFILER
               ON ORGINNLESkobl.FILID = ORIGINALFILER.FILID)
@@ -2567,13 +2552,21 @@ FinnFilBeskGruppe<-function(filgruppe,batchdate=NULL,globs=FinnGlobs(), ...){
               AND ORIGINALFILER.IBRUKTIL>", datef,"
               AND INNLESING.VERSJONFRA<=",datef,"
               AND INNLESING.VERSJONTIL>",datef,sep="")
+
+  bt<-sqlQuery(globs$dbh,sqlt,stringsAsFactors=FALSE)
+
+  ## Picking up files path that is refered to in ORIGINALFILER
+  ## --------------------------------------------------------
+  if (isTRUE(extArg$testfil)) {
+
+    fb <- subset(bt, TESTING == 1L)
+
+  } else {
+
+    fb <- bt
   }
 
-
-
-
-  fb<-sqlQuery(globs$dbh,sqlt,stringsAsFactors=FALSE)
-  return(fb)
+  invisible(fb)
 }
 
 #
@@ -6521,7 +6514,7 @@ KHglobs<-FinnGlobs()
 
 ## TEST
 testmsg <- "#============================#
-#---[ OBS!! Testing pågår ]--#
+#---[ OBS!! Testing mode er aktivert ]---#
 #============================#
 "
 if (isTRUE(runtest)){cat(testmsg)}

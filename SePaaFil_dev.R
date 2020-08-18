@@ -3,7 +3,7 @@
 rm(list = ls())
 
 ## ## Bytt til FALSE for å bruke defpaths i PRODUKSJON og original Access database
-## runtest = TRUE
+runtest = TRUE
 
 if (!require(here)) install.packages("here")
 source(here('khfun_dev.R'))
