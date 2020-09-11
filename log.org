@@ -1,0 +1,9 @@
+#+Title: Gjennomgang av KHFunction
+#+Date: 11.sep 2020
+
+Filen =khfun_dev.R= brukes og er en utvikling versjon for filen =khfunction.R=. Alternative å kunne
+kjøre test gjøres ved å spesifisere følgende i =SePaaFil_dev.R= filen:
+ - ~runtest=TRUE~ for å bruke test kopi av Access DB
+ - ~testfil=TRUE~ i =LagFilgruppe= funksjon for å velge et spesifikk fil i original filer for testing
+
+
