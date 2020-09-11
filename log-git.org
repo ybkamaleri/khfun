@@ -1,0 +1,5 @@
+#+Title: Log for Git changes
+#+Date: 11.09.2020
+* 11.09.2020
+- Add =test= folder
+- Document development with =khfunction= in =log-dev.org= file
