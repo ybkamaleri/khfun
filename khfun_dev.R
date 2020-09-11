@@ -627,7 +627,7 @@ LagFilgruppe<-function(gruppe,batchdate=SettKHBatchDate(),globs=FinnGlobs(),diag
                             dumps=dumps)
         ##Stable delfiler
         Filgruppe<-rbind.fill(Filgruppe,DF)
-
+        
 
         ##Stopp klokke, skriv tid og feillogg
         tid<-proc.time()-tm
@@ -793,7 +793,7 @@ LagTabellFraFil<-function (filbesk,FGP,batchdate=SettKHBatchDate(),diagnose=0,gl
   ## FUN04
   LestFil<-LesFil(filbesk,batchdate=batchdate,globs=globs,dumps=dumps)
 
-
+  
   ok<-LestFil$ok
   DF<-LestFil$DF
 
@@ -994,7 +994,7 @@ LagTabellFraFil<-function (filbesk,FGP,batchdate=SettKHBatchDate(),diagnose=0,gl
 
   TilFilLogg(filbesk$KOBLID,"INNLES_OK",ok,batchdate=batchdate,globs=globs)
 
-
+  
   if (!is.na(filbesk$GRUNNKRETS) && filbesk$GRUNNKRETS==1){
     ## Use tabel GKBydel2004T if this is TRUE
     ##-------------------------------------------
@@ -1029,6 +1029,7 @@ LagTabellFraFil<-function (filbesk,FGP,batchdate=SettKHBatchDate(),diagnose=0,gl
   sqlQuery(globs$log,paste("DELETE * FROM KODEBOK_LOGG WHERE KOBLID=",filbesk$KOBLID,sep=""))
 
   if (ok==1){
+    ## Check the class of each columns
     colClass<-sapply(DF,class)
     if (any(colClass!="character")){
       cat("Advarsel! Kolonnene ",names(DF)[colClass!="character"]," er ikke character (",colClass[colClass!="character"],")\n",sep="")
@@ -2988,6 +2989,9 @@ SettFilInfoKUBE<-function(KUBEid,batchdate=SettKHBatchDate(),versjonert=FALSE,gl
 
 
 LagKUBE<-function(KUBEid,lagRapport=0,batchdate=SettKHBatchDate(),versjonert=FALSE,bare_TN=0,drop_TN=0,tmpbryt=0,FullUt=0,csvcopy=FALSE,globs=FinnGlobs(),echo=0,dumps=list()){
+
+  
+  
   datef<-format(strptime(batchdate, "%Y-%m-%d-%H-%M"),"#%Y-%m-%d#")
   rapport<-list(KUBE=KUBEid,lagRapport=lagRapport)
 
@@ -6513,8 +6517,5 @@ KHglobs<-FinnGlobs()
 
 
 ## TEST
-testmsg <- "#============================#
-#---[ OBS!! Testing mode er aktivert ]---#
-#============================#
-"
-if (isTRUE(runtest)){cat(testmsg)}
+testmsg <- "\n#==========[ OBS!! Testing mode er aktivert ]=========#\n\n"
+if (runtest){message(testmsg)}

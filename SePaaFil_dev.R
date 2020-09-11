@@ -55,11 +55,18 @@ gpnavnSub <- c("ELEVUNDER")
 ## tesfil = TRUE is to choose file where TESTING is 1 in ORGINALFILERse
 LagFilgruppe("ELEVUNDER") #CSV fil
 LagFilgruppe("ELEVUNDER", testfil = TRUE) #CSV fil testfile
+LagFilgruppe("INNTULIKHET", testfil = TRUE) #CSV fil testfile
+LagFilgruppe("BEF_GKny", testfil = TRUE) #CSV fil testfile
+LagFilgruppe("FODEVEKT", testfil = TRUE)
+LagFilgruppe("ENSOMHET_CRUDE_UNGDATA", testfil = TRUE) # Error in Stata
+
+
 LagFilgruppe(gpnavnSub[1])
 LagFilgruppe(gpnavn[2], testfil = TRUE) #csv
 LagFilgruppe("LAVINNT_1G", testfil = T)
 LagFilgruppe("UTDANN_NH",versjonert=TRUE)
 LagFilgruppe("BRUTTOINNTEKT", testfil = TRUE)
+LagFilgruppe("UFORE_L", testfil = TRUE)
 LagFilgruppe("UFORE", testfil = TRUE)
 LagFilgruppe("LESEFERD", testfil = T) #crash med SkrivBKLogg()
 LagFilgruppe("BEF_GKny")
@@ -91,6 +98,10 @@ utFil <- readRDS(file.path(utPath, rdsFil))
 
 
 k <- LagKUBE("SYSVAK_1",dumps=dumps)
+
+LagKUBE("INNTULIKHET")
+LagKUBE("UFORE")
+
 
 #Du kan ogs? lage dump i alle RSYNT-punkter, ved ? legge inn en "lagre fil"-kommando som RSYNT.
 
