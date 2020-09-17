@@ -56,6 +56,7 @@ elvDT <- show_rds(rdsPath,
                rdsFile = "ELEVUNDER.rds",
                srcFile = "Elev_2015.csv")
 
+
 dt <- elvDT$dt
 setDT(dt)
 names(dt)
@@ -110,3 +111,25 @@ sub("\\d+", "\\1", "1234ab56")
 sub("\\D+", "\\1", "1234ab56")
 sub("\\D+\\d+", "\\1", "1234ab56")
 sub("\\D+", "_", "1234ab56")
+
+
+
+## NEET
+## ------
+normalizePath(readClipboard(), win = "/")
+
+rdsPath <- "F:/Prosjekter/Kommunehelsa/PRODUKSJON/PRODUKTER/MELLOMPROD/R/STABLAORG/DATERT"
+DT <- show_rds(rdsPath = rdsPath,
+               rdsFile = "NEET_IMDI_2020-08-20-15-29.rds",
+               rds.only = TRUE)
+DT$dt[, .N, by = ANTALL.a]
+DT$dt[, .N, by = VAL3.a]
+DT$dt[, .N, by = GEOniv]
+DT$dt[GEOniv == "L", ]
+DT$dt[, .N, by = AARl]
+
+
+DT2 <- show_rds(rdsPath = rdsPath,
+                rdsFile = "LUFT_2_5_PWC_2020-08-06-11-38.rds",
+                rds.only = TRUE)
+DT2$dt

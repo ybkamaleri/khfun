@@ -1,7 +1,8 @@
 #+Title: Things to remember
 #+Date: 11.09.2020
 
-#+PROPERTY: header-args:R :tangle no :eval no
+#+PROPERTY: header-args: :tangle no
+#+PROPERTY: header-args:R :eval FALSE
 
 Some of the things that I have to remind myselv.
 * DBI and odbc packages
@@ -22,3 +23,4 @@ It's a wrapper for =dbSendQuery=, =dbFetch= and =dbClearresult=.
   Deler <- DBI::dbGetQuery(conn, "SELECT * FROM KH_DELER")
   dbDisconnect(conn)
 #+END_SRC
+
