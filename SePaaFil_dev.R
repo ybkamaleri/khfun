@@ -3,10 +3,13 @@
 rm(list = ls())
 
 ## ## Bytt til FALSE for å bruke defpaths i PRODUKSJON og original Access database
-runtest = TRUE
+runtest = FALSE
 
-if (!require(here)) install.packages("here")
-source(here('khfun_dev.R'))
+## if (!require(here)) install.packages("here")
+## source(here::here('khfun_dev.R'))
+## Version 20200604 is current version in operation but here
+## I use data.table::melt since reshape2::melt is deprecated
+source(here::here('KHfunctions_20200604.R')) 
 
 BUFFER<-list(BEF_GKa=KlargjorFil("BEF_GKa",versjonert=TRUE)$FIL)
 #BUFFER<-list(BEF_GKa=FinnFilT("BEF_GK_Ta"))
@@ -59,6 +62,7 @@ LagFilgruppe("INNTULIKHET", testfil = TRUE) #CSV fil testfile
 LagFilgruppe("BEF_GKny", testfil = TRUE) #CSV fil testfile
 LagFilgruppe("FODEVEKT", testfil = TRUE)
 LagFilgruppe("ENSOMHET_CRUDE_UNGDATA", testfil = TRUE) # Error in Stata
+LagFilgruppe("SYSVAK")
 
 
 LagFilgruppe(gpnavnSub[1])

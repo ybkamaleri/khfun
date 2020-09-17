@@ -1,9 +1,16 @@
 #+Title: Gjennomgang av KHFunction
 #+Date: 11.sep 2020
-
+* Generell info
 Filen =khfun_dev.R= brukes og er en utvikling versjon for filen =khfunction.R=. Alternative å kunne
 kjøre test gjøres ved å spesifisere følgende i =SePaaFil_dev.R= filen:
  - ~runtest=TRUE~ for å bruke test kopi av Access DB
  - ~testfil=TRUE~ i =LagFilgruppe= funksjon for å velge et spesifikk fil i original filer for testing
+* TODO Options [1/3]
+Disse skal implementeres etterhvert:
+
+- [ ] Valg mulighet for test originalfil - Kolonne *test* i Access 
+- [ ] Loop for lagFilgruppe funksjon - kunne kjøre om natten med =tryCatch()=
+- [X] Bytte =reshape2= pakke pga. pakken er ikke aktiv lenge
+- [ ] Bruke *DBI* og *odbc* pakker istedenfor *RODBC* pga. Access nyeste versjon
 
 
