@@ -10,7 +10,31 @@ kjøre test gjøres ved å spesifisere følgende i =SePaaFil_dev.R= filen:
  - ~testfil=TRUE~ i =LagFilgruppe= funksjon for å velge et spesifikk fil i original filer for testing
 * KHfunction_20200604_dev.R
 - Bytt =reshape2= pakke med =data.table::melt=
-- 
+- Oppdatere kode 
+#+BEGIN_SRC R
+  if (TomRadSlutt = TRUE){
+    ## OBS! restructure for checking
+    ## -----------------------------
+    ## Find where empty row starts
+    totMiss <- rowSums(DF == "")
+    totNA <- rowSums(is.na(DF))
+    tomr1 <- which(totMiss == ncol(DF))
+    tomr2 <- which(totNA == ncol(DF))
+    tomr3 <- c(tomr1, tomr2) #same as tomr below
+
+    ## Alternativ with apply and faster
+    ## row.names(DF[apply(DF=="", 1, all),])
+    tnames <- rownames(DF[apply(is.na(DF) | DF == "", 1, all), ])
+    tomr4 <- which(rownames(DF) %in% tnames)
+  }
+
+  ## Original code
+  tomr<-which(rowSums(is.na(DF) | DF=="") == ncol(DF))
+  if (!is.na(tomr[1])){
+    DF<-DF[1:(tomr[1]-1),]
+  #+END_SRC
+
+
 * TODO Options [1/3]
 Disse skal implementeres etterhvert:
 
