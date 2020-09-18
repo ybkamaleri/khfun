@@ -18,11 +18,20 @@ pkgs <- c("RODBC",
           "blob",
           "cellranger",
           "chron",
-          "cli")
+          "cli",
+          "pillar",
+          "usethis",
+          "data.table",
+          "fs",
+          "here",
+          "glue",
+          "logger")
 
 sapply(pkgs, renv::install)
 
+## renv::install("remotes")
 
+renv::remove("crayon")
 
 ## ------------------------
 ## Regular install packages

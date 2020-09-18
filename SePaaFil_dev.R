@@ -3,13 +3,13 @@
 rm(list = ls())
 
 ## ## Bytt til FALSE for å bruke defpaths i PRODUKSJON og original Access database
-runtest = FALSE
+runtest = TRUE
 
 ## if (!require(here)) install.packages("here")
 ## source(here::here('khfun_dev.R'))
 ## Version 20200604 is current version in operation but here
 ## I use data.table::melt since reshape2::melt is deprecated
-source(here::here('KHfunctions_20200604.R')) 
+source(here::here('KHfunctions_20200604_dev.R')) 
 
 BUFFER<-list(BEF_GKa=KlargjorFil("BEF_GKa",versjonert=TRUE)$FIL)
 #BUFFER<-list(BEF_GKa=FinnFilT("BEF_GK_Ta"))
@@ -57,12 +57,13 @@ gpnavnSub <- c("ELEVUNDER")
 #Dump i innlesingen
 ## tesfil = TRUE is to choose file where TESTING is 1 in ORGINALFILERse
 LagFilgruppe("ELEVUNDER") #CSV fil
-LagFilgruppe("ELEVUNDER", testfil = TRUE) #CSV fil testfile
-LagFilgruppe("INNTULIKHET", testfil = TRUE) #CSV fil testfile
-LagFilgruppe("BEF_GKny", testfil = TRUE) #CSV fil testfile
-LagFilgruppe("FODEVEKT", testfil = TRUE)
-LagFilgruppe("ENSOMHET_CRUDE_UNGDATA", testfil = TRUE) # Error in Stata
-LagFilgruppe("SYSVAK")
+LagFilgruppe("ELEVUNDER", test = TRUE) #CSV fil testfile
+LagFilgruppe("INNTULIKHET", test = TRUE) #CSV fil testfile
+LagFilgruppe("BEF_GKny", test = TRUE) #CSV fil testfile
+LagFilgruppe("FODEVEKT", test = TRUE)
+LagFilgruppe("ENSOMHET_CRUDE_UNGDATA", test = TRUE) # Error in Stata
+LagFilgruppe("SYSVAK", test = TRUE)
+LagFilgruppe("KUHR", test = TRUE)
 
 
 LagFilgruppe(gpnavnSub[1])
@@ -74,7 +75,7 @@ LagFilgruppe("UFORE_L", testfil = TRUE)
 LagFilgruppe("UFORE", testfil = TRUE)
 LagFilgruppe("LESEFERD", testfil = T) #crash med SkrivBKLogg()
 LagFilgruppe("BEF_GKny")
-LagFilgruppe("SYSVAK")
+LagFilgruppe("SYSVAK", test = TRUE)
 
 ## ORigial Access DB. When runtest = FALSE
 LagFilgruppe("LESEFERD")
@@ -141,7 +142,7 @@ kube2filnavn<-"F:/Prosjekter/Kommunehelsa/PRODUKSJON/PRODUKTER/KUBER/NORGESHELSA
 TmpRutineSammenlignKHkuber(kubefilnavn1,kubefilnavn2,KUBENAVN,tabs)
 
 #---------------------------------------------------------------------------------------------
-BUFFERbatch  !!!!!!!
+## BUFFERbatch  !!!!!!!
 
 BUFFER[["BEF_GKu"]]<-FinnFilT("BEF_GK_Tu")
 

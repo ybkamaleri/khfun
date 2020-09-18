@@ -51,7 +51,7 @@ require(foreign) #Brukes ved lesing av SPSS, dBF
 #require(gdata)  #Brukes ved lesing av xls/xlsx filer
 require(sas7bdat) #brukes ved lesing av SAS filer
 require(XML)
-require(reshape2)  #melt brukes til wide->long
+## require(reshape2)  #melt brukes til wide->long
 require(zoo)  #na.locf for ? sette inn for NA i innrykket originaltabulering
 require(plyr)  #mapvalues for omkoding
 require(sqldf)
@@ -59,15 +59,37 @@ require(stringr)
 require(intervals)
 require(data.table) #Bruker data.table for rask merge
 require(readxl)
-if (!require(fs)) install.package("fs")
+## if (!require(fs)) install.package("fs")
 require(fs)
 
-#Brukte pather under utvikling (NB: prioritert rekkefølge under)
-defpaths<-c("F:/Prosjekter/Kommunehelsa/PRODUKSJON",
-            "F:/Prosjekter/Kommunehelsa/PRODUKSJON/DEVELOP",
-            "F:/Prosjekter/Kommunehelsa/Data og databehandling/kbDEV",
-            "J:/FHI/PRODUKSJON",
-            "J:/kbDEV")
+## #Brukte pather under utvikling (NB: prioritert rekkefølge under)
+## defpaths<-c("F:/Prosjekter/Kommunehelsa/PRODUKSJON",
+##             "F:/Prosjekter/Kommunehelsa/PRODUKSJON/DEVELOP",
+##             "F:/Prosjekter/Kommunehelsa/Data og databehandling/kbDEV",
+##             "J:/FHI/PRODUKSJON",
+##             "J:/kbDEV")
+
+
+if(!exists("runtest")) runtest = FALSE
+if(runtest) {test = "Ja"} else {test = "Nei"}
+
+## Path for Database and output
+defpaths <- switch(test,
+                   Nei = c("F:/Prosjekter/Kommunehelsa/PRODUKSJON",
+                           "F:/Prosjekter/Kommunehelsa/PRODUKSJON/DEVELOP",
+                             "F:/Prosjekter/Kommunehelsa/Data og databehandling/kbDEV",
+                             "J:/FHI/PRODUKSJON",
+                             "J:/kbDEV"),
+                   Ja = "c:/enc/DBtest")
+
+## Database filename
+filDB <- switch(test,
+                Nei = "KHELSA.mdb",
+                Ja = "KHELSA_dev.mdb")
+
+## set root for ORIGINAL files when test=TRUE instead of c:/enc/DBtest
+originalPath <- "F:/Prosjekter/Kommunehelsa/PRODUKSJON"
+
 
 
 #GLOBAL FIXED PARAMETERS, leses bare av SettGlobs, bakes så inn i globs
@@ -78,7 +100,8 @@ globglobs<-list(
   HOVEDmodus="NH",
   KHaargang=2020,
   KHgeoniv="K",
-  KHdbname="STYRING/KHELSA.mdb",
+  KHdbname = paste("STYRING", filDB, sep = "/"),
+  ## KHdbname="STYRING/KHELSA.mdb",
   KHlogg="STYRING/KHlogg.mdb",
   StablaDir="PRODUKTER/MELLOMPROD/R/STABLAORG/",
   StablaDirNy="PRODUKTER/MELLOMPROD/R/STABLAORG/NYESTE",
@@ -454,7 +477,30 @@ ListAlleOriginalFiler<-function(globs=FinnGlobs()){
 ##########################################################
 
 #
-LagFilgruppe<-function(gruppe,batchdate=SettKHBatchDate(),globs=FinnGlobs(),diagnose=0,printR=TRUE,printCSV=FALSE,printSTATA=FALSE,versjonert=FALSE,dumps=list()){
+LagFilgruppe<-function(gruppe,
+                       batchdate=SettKHBatchDate(),
+                       globs=FinnGlobs(),
+                       diagnose=0,
+                       printR=TRUE,
+                       printCSV=FALSE,
+                       printSTATA=FALSE,
+                       versjonert=FALSE,
+                       dumps=list(),
+                       test = FALSE){
+
+
+  ## test is TRUE when column 'TESTING' in ORIGINALFILER is used
+  ## for selecting the file to be processed
+  lineMsg <- "-----------------------"
+  if(test) message(lineMsg,
+                   "\n** -- Test Modus -- **")
+  
+  ## To see which DB is currently used
+  message(lineMsg,
+          "\n  Database: ", globs$KHdbname,
+          "\n  DB path:  ", globs$path, "\n", 
+          lineMsg)
+
   #Essensielt bare loop over alle delfiler/orignalfiler
   #For hver orignalfil kjøres LagTabellFraFil
   #Stables til tabellen FG
@@ -466,13 +512,22 @@ LagFilgruppe<-function(gruppe,batchdate=SettKHBatchDate(),globs=FinnGlobs(),diag
     #Rydd gammel logg
     sqlQuery(globs$log,paste("DELETE * FROM KODEBOK_LOGG WHERE FILGRUPPE='",gruppe,"' AND SV='S'",sep=""))
     sqlQuery(globs$log,paste("DELETE * FROM INNLES_LOGG WHERE FILGRUPPE='",gruppe,"' AND SV='S'",sep=""))
+
     #Finn parameterbeskrivelse av delfilene
-    delfiler<-FinnFilBeskGruppe(gruppe,batchdate=batchdate,globs=globs)
+    delfiler<-FinnFilBeskGruppe(gruppe,batchdate=batchdate,globs=globs, test = test)
+
     if(nrow(delfiler)>0){
       for (i in 1:nrow(delfiler)){
+
+        ## ## set root path
+        ## getSti <- globs$path
+        ## if (test)
+        getSti <- originalPath
+
         filbesk<-delfiler[i,]
         tm<-proc.time()
-        filbesk$filn<-paste(globs$path,filbesk$FILNAVN,sep="/")
+        ## set root for original files
+        filbesk$filn<-paste(getSti,filbesk$FILNAVN,sep="/")
         filbesk$filn<-gsub("\\\\","/",filbesk$filn)
         #Sett evt default for år basert på aktuelt årstall
         filbesk$AAR<-gsub("<\\$y>",paste("<",filbesk$DEFAAR,">",sep=""),filbesk$AAR)
@@ -589,8 +644,16 @@ LagFilgruppe<-function(gruppe,batchdate=SettKHBatchDate(),globs=FinnGlobs(),diag
       }
     }
   }
-  return(Filgruppe)
+
+  ht2(Filgruppe)
 }
+
+
+## show head and tail 
+ht2 <- function(x, n = 3){
+  rbind(head(x, n), tail(x, n))
+}
+
 
 #
 LagFlereFilgrupper<-function(filgrupper=character(0),batchdate=SettKHBatchDate(),globs=FinnGlobs(),printR=TRUE,printCSV=FALSE,printSTATA=FALSE,versjonert=FALSE){
@@ -2173,14 +2236,14 @@ FinnFilgruppeParametre<-function(gruppe,batchdate=SettKHBatchDate(),globs=FinnGl
 }
 
 #
-FinnFilBeskGruppe<-function(filgruppe,batchdate=NULL,globs=FinnGlobs()){
+FinnFilBeskGruppe<-function(filgruppe,batchdate=NULL,globs=FinnGlobs(), test = FALSE){
   #Default er å finne filbesk gyldige nå (Sys.time)
   datef<-format(Sys.time(), "#%Y-%m-%d#")
   #ALternativt kan man finne for en historisk batchdate
   if (!is.null(batchdate)){
     datef<-format(strptime(batchdate, "%Y-%m-%d-%H-%M"),"#%Y-%m-%d#")
   }
-  sqlt<-paste("SELECT KOBLID, ORIGINALFILER.FILID AS FILID, FILNAVN, FORMAT, DEFAAR, INNLESING.*
+  sqlt<-paste("SELECT KOBLID, ORIGINALFILER.FILID AS FILID, FILNAVN, FORMAT, DEFAAR, TESTFIL, INNLESING.*
               FROM INNLESING INNER JOIN 
               (  ORGINNLESkobl INNER JOIN ORIGINALFILER 
               ON ORGINNLESkobl.FILID = ORIGINALFILER.FILID)
@@ -2192,7 +2255,13 @@ FinnFilBeskGruppe<-function(filgruppe,batchdate=NULL,globs=FinnGlobs()){
               AND INNLESING.VERSJONFRA<=",datef," 
               AND INNLESING.VERSJONTIL>",datef,sep="")
   fb<-sqlQuery(globs$dbh,sqlt,stringsAsFactors=FALSE)
-  return(fb)
+
+  ## Picking up files path that is refered to in ORIGINALFILER
+  ## --------------------------------------------------------
+  if (test) 
+    fb <- subset(fb, TESTFIL == 1)
+
+  invisible(fb)
 }
 
 #

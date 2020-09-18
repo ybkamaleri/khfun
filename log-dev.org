@@ -10,6 +10,8 @@ kjøre test gjøres ved å spesifisere følgende i =SePaaFil_dev.R= filen:
  - ~testfil=TRUE~ i =LagFilgruppe= funksjon for å velge et spesifikk fil i original filer for testing
 * KHfunction_20200604_dev.R
 - Bytt =reshape2= pakke med =data.table::melt=
+- Legg =test= arg i =LagFilgruppe= for å kunne velge originalfil for testing i /ORIGINALFILER/ tabellen.
+- Lagt =ht2= funksjon for å vise /head/ og /tail/ i data.frame
 - Oppdatere kode 
 #+BEGIN_SRC R
   if (TomRadSlutt = TRUE){
