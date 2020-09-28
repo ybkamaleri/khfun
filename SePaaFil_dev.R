@@ -53,6 +53,10 @@ gpnavnSub <- c("ELEVUNDER")
 ## notes:
 ## ELEVUNDER is tested with PRIKKET
 
+## Reopen connection 
+## because all connections are closed everytime LagFilgruppe is completed
+KHglobs<-SettGlobs()
+
 
 #Dump i innlesingen
 ## tesfil = TRUE is to choose file where TESTING is 1 in ORGINALFILERse

@@ -488,7 +488,6 @@ LagFilgruppe<-function(gruppe,
                        dumps=list(),
                        test = FALSE){
 
-
   ## test is TRUE when column 'TESTING' in ORIGINALFILER is used
   ## for selecting the file to be processed
   lineMsg <- "-----------------------"

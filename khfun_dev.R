@@ -2561,9 +2561,7 @@ FinnFilBeskGruppe<-function(filgruppe,batchdate=NULL,globs=FinnGlobs(), ...){
   if (isTRUE(extArg$testfil)) {
 
     fb <- subset(bt, TESTING == 1L)
-
   } else {
-
     fb <- bt
   }
 
