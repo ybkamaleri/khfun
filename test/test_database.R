@@ -59,3 +59,9 @@ MDBPATH <- "C:\\enc\\DBtest\\STYRING\\KHELSA_dev.mdb"
 
 cs <- paste0(db_con, MDBPATH)
 con <- dbConnect(odbc::odbc(), .connection_string = cs)
+con
+orgTb <- "ORIGINALFILER"
+DBI::dbListTables(con)
+
+rq <- DBI::dbSendQuery(con, "SELECT TOP 5 * FROM ORIGINALFILER")
+DBI::dbFetch(rq)
