@@ -73,6 +73,7 @@ MDBPATH <- "C:\\enc\\DBtest\\STYRING\\KHELSA_dev.mdb"
 MDBPATH
 cs <- paste0(db_con, MDBPATH)
 con <- dbConnect(odbc::odbc(), .connection_string = cs)
+<<<<<<< HEAD
 
 DBI::dbGetQuery(con, "SELECT TOP 5 * FROM KH_DELER")
 
@@ -82,3 +83,11 @@ MDBPATH
 con <- DBI::dbConnect(odbc::odbc(),
                       driver = "Microsoft Access Driver (*.mdb, *.accdb)",
                       database = MDBPATH)
+=======
+con
+orgTb <- "ORIGINALFILER"
+DBI::dbListTables(con)
+
+rq <- DBI::dbSendQuery(con, "SELECT TOP 5 * FROM ORIGINALFILER")
+DBI::dbFetch(rq)
+>>>>>>> 0573ee2579d967a26b28ca3474888299f6215ec9
