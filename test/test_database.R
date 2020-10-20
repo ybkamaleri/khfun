@@ -74,6 +74,7 @@ MDBPATH
 cs <- paste0(db_con, MDBPATH)
 con <- dbConnect(odbc::odbc(), .connection_string = cs)
 
+## dbGetQuery must be used for interactive instead of dbSendQuery
 DBI::dbGetQuery(con, "SELECT TOP 5 * FROM KH_DELER")
 
 ## Connection Strings
@@ -81,6 +82,13 @@ con
 orgTb <- "ORIGINALFILER"
 DBI::dbListTables(con)
 
+## dbSendQuery should use dbFetch and dbClearResult
 rq <- DBI::dbSendQuery(con, "SELECT TOP 5 * FROM ORIGINALFILER")
 DBI::dbFetch(rq)
+DBI::dbClearResult(rq)
 
+
+library(glue)
+sqq <- glue::glue_sql("SELECT TOP 5 * FROM {`orgTb`}",
+                      .con = DBI::ANSI())
+DBI::dbGetQuery(con, sqq)
