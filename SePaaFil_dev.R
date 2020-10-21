@@ -225,4 +225,4 @@ write.table(comp$V12,file=Comparefile,sep=';',na="",row.names = FALSE)
 
 
 
-
+LagKubeDatertCsv("ARBLEDIGE")
