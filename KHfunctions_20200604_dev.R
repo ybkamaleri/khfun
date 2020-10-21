@@ -62,6 +62,10 @@ require(readxl)
 ## if (!require(fs)) install.package("fs")
 require(fs)
 
+library(here)
+library(glue)
+library(logger)
+
 ## #Brukte pather under utvikling (NB: prioritert rekkefølge under)
 ## defpaths<-c("F:/Prosjekter/Kommunehelsa/PRODUKSJON",
 ##             "F:/Prosjekter/Kommunehelsa/PRODUKSJON/DEVELOP",
@@ -90,6 +94,9 @@ filDB <- switch(test,
 ## set root for ORIGINAL files when test=TRUE instead of c:/enc/DBtest
 originalPath <- "F:/Prosjekter/Kommunehelsa/PRODUKSJON"
 
+
+## BIG TROUBLE!!! Watch out when setting up path. Too many 'setwd()' are used!
+## Path is specified to where the "STYRING/NameAccessFile.mdb" file is in!
 
 
 #GLOBAL FIXED PARAMETERS, leses bare av SettGlobs, bakes så inn i globs
@@ -157,27 +164,34 @@ globglobs<-list(
 #Setter standard designegenskaper, slik som delenes kolonnenavn og status i omkoding
 #Se tabell KH_DELER
 SettDefDesignKH<-function(globs=FinnGlobs()){
+  ## Needs only connection to db from globs
+  ## --------------------------------------
   Deler<-sqlQuery(globs$dbh,"SELECT * FROM KH_DELER",as.is=TRUE,stringsAsFactors=FALSE)
-  #DelKols<-lapply(as.list(setNames(Deler$DelKols, Deler$DEL)),function(x){unlist(str_split(x,pattern=","))})
-  #Tilrettelegging for enkle oppslag:
-  DelKolN<-setNames(Deler$DelKol,Deler$DEL)
-  DelKolE<-setNames(Deler$DelKolE,Deler$DEL)
-  DelType<-setNames(Deler$TYPE,Deler$DEL)
-  DelFormat<-setNames(Deler$FORMAT,Deler$DEL)
-  AggPri<-Deler$DEL[order(Deler$AGGREGERPRI)]
-  AggVedStand<-Deler$DEL[Deler$AGGREGERvedPRED==1]
+
+
+  ##DelKols<-lapply(as.list(setNames(Deler$DelKols, Deler$DEL)),function(x){unlist(str_split(x,pattern=","))})
+  ##Tilrettelegging for enkle oppslag:
+  DelKolN<-setNames(Deler$DelKol,Deler$DEL) #give attributes DEL to DelKol
+  DelKolE<-setNames(Deler$DelKolE,Deler$DEL) #give attributes DEL to DelKolE ie. "FYLKE,GEO"
+  DelType<-setNames(Deler$TYPE,Deler$DEL) # column TYPE with attribute from DEL
+  DelFormat<-setNames(Deler$FORMAT,Deler$DEL) #column FORMAT with attribute DEL
+  AggPri<-Deler$DEL[order(Deler$AGGREGERPRI)] #get ordered DEL according to AGGREGERPRI
+  AggVedStand<-Deler$DEL[Deler$AGGREGERvedPRED==1] #select only A and K. Why??
   IntervallHull<-setNames(Deler$INTERVALLHULL,Deler$DEL)
   IntervallHull<-IntervallHull[!(is.na(IntervallHull) | IntervallHull=="")]
   
   DelKols<-as.list(DelKolN)
-  DelKolsF<-DelKols
+  DelKolsF<-DelKols # Why do we need this?
   KolsDel<-list()
   for (del in names(DelKols)){
+    ## loop column DEL and check TYPE
     if (DelType[del]=="INT"){
+      ## Add l (lower) and h (high) if FORMAT is INT i.e AAR and ALDER
       DelKols[[del]]<-paste(DelKols[[del]],c("l","h"),sep="")
-      DelKolsF[[del]]<-DelKols[[del]]
+      DelKolsF[[del]]<-DelKols[[del]] #Add lower and higher columns to DelKolsF
     }
     if (!(is.na(DelKolE[[del]]) | DelKolE[[del]]=="")){
+      ## Add Fylke and GEO to the vector from DelKolE
       DelKolsF[[del]]<-c(DelKolsF[[del]],unlist(str_split(DelKolE[[del]],",")))
     }
     for (kol in DelKols[[del]]){
@@ -185,16 +199,18 @@ SettDefDesignKH<-function(globs=FinnGlobs()){
     }
   }
   
-    
+  ## Get DEL for the specified OMKODbet is. U,B,F
   UBeting<-Deler$DEL[Deler$OMKODbet=="U"]
   BetingOmk<-Deler$DEL[Deler$OMKODbet=="B"]
   BetingF<-Deler$DEL[Deler$OMKODbet=="F"]
-  OmkDel<-c(UBeting,BetingOmk)
-  #IntervallHull<-list(A="DekkInt/TotInt>0.999 | (NTOT>=10 & NHAR/NTOT>0.8) | (TotInt<=20 & DekkInt>=10) | TotInt<=10")
+  OmkDel<-c(UBeting,BetingOmk) #Not used in the code but returned!
   
-  DesignKols<-c(unlist(DelKols[c(UBeting,BetingOmk)]))
-  DesignKolsF<-c(DesignKols,unlist(DelKols[BetingF]))
-  DesignKolsFA<-c(DesignKolsF,setdiff(unlist(DelKolsF[c(UBeting,BetingOmk)]),unlist(DelKols[c(UBeting,BetingOmk)])))
+  ##IntervallHull<-list(A="DekkInt/TotInt>0.999 | (NTOT>=10 & NHAR/NTOT>0.8) | (TotInt<=20 & DekkInt>=10) | TotInt<=10")
+
+  DesignKols<-c(unlist(DelKols[c(UBeting,BetingOmk)])) #Columns without TABS
+  DesignKolsF<-c(DesignKols,unlist(DelKols[BetingF])) #Columns including TABS
+  DesignKolsFA<-c(DesignKolsF,setdiff(unlist(DelKolsF[c(UBeting,BetingOmk)]),
+                                      unlist(DelKols[c(UBeting,BetingOmk)]))) #All columns including FYLKE and GEO
   
   
   
@@ -222,10 +238,17 @@ SettDefDesignKH<-function(globs=FinnGlobs()){
 
 SettKodeBokGlob<-function(globs=FinnGlobs()){
   
+  ## Merge tabels KH_OMKOD and KH_KODER and rename KH_KODER as in KH_OMKOD for merging. Assign 0 to
+  ## 4 to PRI_OMKOD for prioritizing and 0-1 to OBLIG to mean obligatory or not from KH_KODER that
+  ## doesn't have these colnames. KH_KODER tabel defines all the values in KH_OMKOD tabel
   OmkodD<-sqlQuery(globs$dbh,"SELECT * FROM KH_OMKOD 
                             UNION SELECT ID, DEL, KODE as NYKODE, KODE as ORGKODE, 0 as PRI_OMKOD, 1 AS OBLIG FROM KH_KODER",as.is=TRUE,stringsAsFactors=FALSE)
   KB<-list()  
   
+
+
+  ## !OBS! What this process is doing???
+  ## NYKODE as B/H etc under NYKODE - H=Helseregion B=Bydel
   for (del in names(globs$DefDesign$DelKolN)){
     KBD<-subset(OmkodD,DEL==del)
     if (globs$DefDesign$DelType[del]=="INT"){
@@ -369,26 +392,36 @@ SettGlobs<-function(path="",modus=NA,gibeskjed=FALSE) {
     modus=globs$HOVEDmodus
   }
   
+  ## Specify Directory for output
+  ##-----------------------------
   if (modus=="KH"){
     globs$KubeDir<-globs$KubeDir_KH
     globs$KubeDirNy<-globs$KubeDirNy_KH
     globs$KubeDirDat<-globs$KubeDirDat_KH
-    globs$FriskVDir<-globs$FriskVDir_KH
+    globs$FriskVDir<-globs$FriskVDir_KH #!OBS! Cant't find FriskVDir_KH
   } else {
     globs$KubeDir<-globs$KubeDir_NH
     globs$KubeDirNy<-globs$KubeDirNy_NH
     globs$KubeDirDat<-globs$KubeDirDat_NH
     globs$FriskVDir<-globs$FriskVDir_NH
   }
+
+  ## Get the Access database filename with ext.
+  ##--------------------------------------------
   KHdbname<-globs$KHdbname
   #Sett path om denne ikker er oppgitt:
  
   
+  ## Give path where Access database file is if not already given
+  ## ------------------------------------------------------------
+  ##Sett path om denne ikker er oppgitt:
   if (path==""){
+    ## check if database file is in the working directory and sett path if it's there
     if(file.exists(paste(getwd(),KHdbname,sep="/"))){
       path<-getwd()      
       if (gibeskjed==TRUE){cat("Setter path=",path,"fra getwd()\n")}
     } else {
+      ## if file not in working directory. Search at defpaths list
       i<-1
       while (path=="" & i<=length(defpaths)){
         if(file.exists(paste(defpaths[i],KHdbname,sep="/"))){
@@ -398,6 +431,7 @@ SettGlobs<-function(path="",modus=NA,gibeskjed=FALSE) {
         i<-i+1
       }
     }
+    ## If path is still missing i.e database not found, gives warning
     if (path==""){
       cat(globs$stjstr,"******KRITISK FEIL: path ikke funnet\n",globs$stjstr,sep="")
     }
@@ -406,29 +440,52 @@ SettGlobs<-function(path="",modus=NA,gibeskjed=FALSE) {
     path<-""
   }
   
+  ## ACCESS FILE is found then.... DO this!!
+  ## -------------------------------------
   if (path!=""){
-    #Sys.getenv("R_ARCH")   gir "/x64"eller "/i386" 
-    KHOc<-odbcConnectAccess2007(paste(path,globs$KHdbname,sep="/"))
-    #KHOc<-odbcConnectAccess(paste(path,KHdbname,sep="/"))
-    KHLc<-odbcConnectAccess2007(paste(path,globs$KHlogg,sep="/"))
+    ##Sys.getenv("R_ARCH")   gir "/x64"eller "/i386"
+    KHOc<-odbcConnectAccess2007(paste(path,globs$KHdbname,sep="/")) #Connection to KHELSA.mdb
+    ##KHOc<-odbcConnectAccess(paste(path,KHdbname,sep="/"))
+    KHLc<-odbcConnectAccess2007(paste(path,globs$KHlogg,sep="/")) #Connection to KHlogg.mdb
   }
+
+
+  ## Add ODBC connection for Access database and Access Log file
+  ## -----------------------------------------------------------
   globs<-c(globs,list(dbh=KHOc,log=KHLc,path=path))
   
+  ## Connect to different GEO tabels as lookup tabels
+  ## ------------
+  ## For raw data that has TEXT input to  be coded to the correct GEO ID
   GeoNavn<-data.table(sqlQuery(KHOc,"SELECT * from GeoNavn",as.is=TRUE))
+  ## GEO id, names, valid from/to, GEO level (GEOniv) ie. Land/Fylke/Kommune/S/H/B and TYPE O/U
   GeoKoder<-data.table(sqlQuery(KHOc,"SELECT * from GEOKoder",as.is=TRUE),key=c("GEO"))
-  UtGeoKoder<-GeoKoder[TYP=="O"]$GEO
+  UtGeoKoder<-GeoKoder[TYP=="O"]$GEO ## !OBS! what is this?
+  ## Recode for GEO to new GEO_omk. Col HARMstd is just for reference
   KnrHarm<-data.table(sqlQuery(KHOc,"SELECT * from KnrHarm",as.is=TRUE),key=c("GEO"))
+  ## Use for data from NAV for GEO recoding based on Tygde offices
   TKNR<-data.table(sqlQuery(KHOc,"SELECT * from TKNR",as.is=TRUE),key=c("ORGKODE"))
+  ## Fylke code to create health region
   HELSEREG<-data.table(sqlQuery(KHOc,"SELECT * from HELSEREG",as.is=TRUE),key=c("FYLKE"))
-  #Gjelder også for soner
+
+  ## !OBS! why add 00? Check the different and when are they used btw. KnrHarm and KnrHarmS
+  ## In cases where raw data doesn't have kommune GEO but include only Bydele GEO. Then to get the
+  ## Fylke or Land sum/total, summing up these depends if Bydeler will be treated as Kommune since
+  ## it only has Bydeler or raw data has both Bydeler and Kommune GEO i.e Oslo.
+  ##Gjelder ogs? for soner
   KnrHarmS<-lapply(KnrHarm[,c("GEO","GEO_omk"),with=FALSE],function(x){paste(x,"00",sep="")})
+  ## Why use 00 when Sone is available in GeoKoder??
+
+
   KnrHarmS<-cbind(as.data.frame(KnrHarmS,stringsAsFactors=FALSE),HARMstd=KnrHarm$HARMstd)
   KnrHarm<-rbind(KnrHarm,KnrHarmS)
   #Må legge til de som ikke omkodes for å lette bruk i merge
   #KnrHarm<-rbind(KnrHarm,data.frame(KNRorg=GeoKoder$GEO[TIL<2008],KNRharm=GeoKoder$GEO[TIL<2008],HARMstd=2008))
   
   
-  #GK til bydel. Bør konsolideres med KnrHarm
+  ## GEO for Grunnkrets and period when they are valid
+  ## --------------------------------------------------
+  ##GK til bydel. B?r konsolideres med KnrHarm
   GkBHarm<-data.table(sqlQuery(KHOc,"SELECT * FROM GKBydel2004T",as.is=TRUE),key=c("GK,Bydel2004"))
   
   globs$DefDesign<-SettDefDesignKH(globs=globs)
@@ -455,6 +512,9 @@ FinnGlobs<-function(){
 
 #KHglobs<-SettGlobs()
 
+## ---------------------------------
+## !OBS! This function is not used!!
+## ---------------------------------
 ListAlleOriginalFiler<-function(globs=FinnGlobs()){
   print(sqlQuery(globs$log,"DROP TABLE ALLEFILER"))
   setwd(paste(globs$path,"ORGDATA",sep="/"))
@@ -476,6 +536,7 @@ ListAlleOriginalFiler<-function(globs=FinnGlobs()){
 #         Gir ferdige stablede filer i \\StablaFilGrupper
 ##########################################################
 
+## OBS! Add tesfil=FALSE for selecting file for testing
 #
 LagFilgruppe<-function(gruppe,
                        batchdate=SettKHBatchDate(),
@@ -511,6 +572,11 @@ LagFilgruppe<-function(gruppe,
     #Rydd gammel logg
     sqlQuery(globs$log,paste("DELETE * FROM KODEBOK_LOGG WHERE FILGRUPPE='",gruppe,"' AND SV='S'",sep=""))
     sqlQuery(globs$log,paste("DELETE * FROM INNLES_LOGG WHERE FILGRUPPE='",gruppe,"' AND SV='S'",sep=""))
+
+
+    ## FUN02
+    ## -------
+    ## add testfil for selecting file for testing
 
     #Finn parameterbeskrivelse av delfilene
     delfiler<-FinnFilBeskGruppe(gruppe,batchdate=batchdate,globs=globs, test = test)

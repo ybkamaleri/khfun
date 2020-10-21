@@ -68,6 +68,7 @@ LagFilgruppe("FODEVEKT", test = TRUE)
 LagFilgruppe("ENSOMHET_CRUDE_UNGDATA", test = TRUE) # Error in Stata
 LagFilgruppe("SYSVAK", test = TRUE)
 LagFilgruppe("KUHR", test = TRUE)
+LagFilgruppe("ARBLEDIGE")
 
 
 LagFilgruppe(gpnavnSub[1])
@@ -109,7 +110,8 @@ utFil <- readRDS(file.path(utPath, rdsFil))
 k <- LagKUBE("SYSVAK_1",dumps=dumps)
 
 LagKUBE("INNTULIKHET")
-LagKUBE("UFORE")
+LagKUBE("UFORE", dumps = dumps)
+LagKUBE("ARBLEDIGE")
 
 
 #Du kan ogs? lage dump i alle RSYNT-punkter, ved ? legge inn en "lagre fil"-kommando som RSYNT.
