@@ -36,9 +36,8 @@ kjøre test gjøres ved å spesifisere følgende i =SePaaFil_dev.R= filen:
     tomr3 <- c(tomr1, tomr2) #same as tomr below
 
     ## Alternativ with apply and faster
-    ## row.names(DF[apply(DF=="", 1, all),])
     tnames <- rownames(DF[apply(is.na(DF) | DF == "", 1, all), ])
-    tomr4 <- which(rownames(DF) %in% tnames)
+    tomr4 <- DF[-(as.numeric(tnames)), ]
   }
 
   ## Original code

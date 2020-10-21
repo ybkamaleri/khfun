@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="no" xml:lang="no">
 <head>
-<!-- 2020-10-21 ons. 11:53 -->
+<!-- 2020-10-21 ons. 17:50 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Gjennomgang av KHFunction</title>
@@ -228,16 +228,16 @@
 <h2>Innhold</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#org9a3e3b2">1. Generell info</a></li>
-<li><a href="#org99525dd">2. KHfunction_20200604_dev.R</a></li>
-<li><a href="#org21edc03">3. <span class="todo TODO">TODO</span> Options <code>[1/3]</code></a></li>
+<li><a href="#orgf6bdf9b">1. Generell info</a></li>
+<li><a href="#org980a8e6">2. KHfunction_20200604_dev.R</a></li>
+<li><a href="#org7d57012">3. <span class="todo TODO">TODO</span> Options <code>[1/3]</code></a></li>
 </ul>
 </div>
 </div>
 
 
-<div id="outline-container-org9a3e3b2" class="outline-2">
-<h2 id="org9a3e3b2"><span class="section-number-2">1</span> Generell info</h2>
+<div id="outline-container-orgf6bdf9b" class="outline-2">
+<h2 id="orgf6bdf9b"><span class="section-number-2">1</span> Generell info</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 Filen <code>khfun_dev.R</code> brukes og er en utvikling versjon for filen <code>khfunction.R</code>. Alternative å kunne
@@ -249,8 +249,8 @@ kjøre test gjøres ved å spesifisere følgende i <code>SePaaFil_dev.R</code> f
 </ul>
 </div>
 </div>
-<div id="outline-container-org99525dd" class="outline-2">
-<h2 id="org99525dd"><span class="section-number-2">2</span> KHfunction_20200604_dev.R</h2>
+<div id="outline-container-org980a8e6" class="outline-2">
+<h2 id="org980a8e6"><span class="section-number-2">2</span> KHfunction_20200604_dev.R</h2>
 <div class="outline-text-2" id="text-2">
 <ul class="org-ul">
 <li>Bytt <code>reshape2</code> pakke med <code>data.table::melt</code></li>
@@ -270,9 +270,8 @@ kjøre test gjøres ved å spesifisere følgende i <code>SePaaFil_dev.R</code> f
   tomr3 &lt;- c(tomr1, tomr2) #same as tomr below
 
   ## Alternativ with apply and faster
-  ## row.names(DF[apply(DF=="", 1, all),])
   tnames &lt;- rownames(DF[apply(is.na(DF) | DF == "", 1, all), ])
-  tomr4 &lt;- which(rownames(DF) %in% tnames)
+  tomr4 &lt;- DF[-(as.numeric(tnames)), ]
 }
 
 ## Original code
@@ -285,8 +284,8 @@ if (!is.na(tomr[1])){
 </div>
 
 
-<div id="outline-container-org21edc03" class="outline-2">
-<h2 id="org21edc03"><span class="section-number-2">3</span> <span class="todo TODO">TODO</span> Options <code>[1/3]</code></h2>
+<div id="outline-container-org7d57012" class="outline-2">
+<h2 id="org7d57012"><span class="section-number-2">3</span> <span class="todo TODO">TODO</span> Options <code>[1/3]</code></h2>
 <div class="outline-text-2" id="text-3">
 <p>
 Disse skal implementeres etterhvert:
