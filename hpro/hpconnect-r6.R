@@ -36,18 +36,3 @@ hp <- R6::R6Class(
 )
 
 
-## Read DB
-## -------
-
-DB <- "c:/enc/DBtest/STYRING/KHELSA_dev.accdb"
-
-db <- hp$new(DB)
-db$dbname
-db$db_connect()
-
-DBI::dbGetQuery(db$dbconn, "SELECT TOP 10 * FROM KODEBOK")
-db$db_close()
-
-## Will close connection when remove coz of finalize
-rm(db)
-gc()
