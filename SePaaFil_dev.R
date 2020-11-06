@@ -68,7 +68,8 @@ LagFilgruppe("FODEVEKT", test = TRUE)
 LagFilgruppe("ENSOMHET_CRUDE_UNGDATA", test = TRUE) # Error in Stata
 LagFilgruppe("SYSVAK", test = TRUE)
 LagFilgruppe("KUHR", test = TRUE)
-LagFilgruppe("ARBLEDIGE")
+LagFilgruppe("ARBLEDIGE", test = TRUE)
+LagFilgruppe("FORSVARET_SESJON1") #har mange Stata kjøring
 
 
 LagFilgruppe(gpnavnSub[1])
@@ -101,9 +102,6 @@ utFil <- readRDS(file.path(utPath, rdsFil))
 
 
 ### ======= END =====================
-
-
-
 
 
 
