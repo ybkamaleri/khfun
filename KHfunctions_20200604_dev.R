@@ -985,8 +985,10 @@ LagTabellFraFil<-function (filbesk,FGP,batchdate=SettKHBatchDate(),diagnose=0,gl
     #RENSK ALDER
     #Sett intervall for alder ALLE
     if ("ALDER" %in% names(DF)){
-      DF$ALDER<-gsub(" \\Wr\\b"," år",DF$ALDER,perl=TRUE)   #Problem med codebook i dbf
       
+      DF$ALDER<-gsub(" \\Wr\\b"," år",DF$ALDER,perl=TRUE)   #Problem med codebook i dbf
+
+      ## Crate a frequency table on age variable
       org<-setNames(as.data.frame(table(DF$ALDER,useNA="ifany"),stringsAsFactors=FALSE),c("ORG","FREQ"))
       alder<-ALDERvask(org,FGP=FGP,filbesk=filbesk,batchdate=batchdate,globs=globs)
       
@@ -1229,13 +1231,13 @@ LagTabellFraFil<-function (filbesk,FGP,batchdate=SettKHBatchDate(),diagnose=0,gl
     SVcloneRecord(globs$log,"INNLES_LOGG",filbesk$KOBLID)
     SVcloneRecord(globs$log,"KODEBOK_LOGG",filbesk$KOBLID)
     #SVcloneRecord(globs$log,"KODEBOK_LOGG",filbesk$KOBLID)
-  }
   
+  }
   if (ok==0){
     DF<-data.frame()
     #DF<-DF[0,] #Fungerer ikke mht class, som kan være feil
   }
- 
+  
   return(DF)
 }
 
@@ -1247,6 +1249,7 @@ LesFil<-function (filbesk,batchdate=SettKHBatchDate(),globs=FinnGlobs(),dumps=ch
   filn<-filbesk$filn
   format<-filbesk$FORMAT
   opt<-filbesk$INNLESARG
+  ## fgp <- filbesk$FILGRUPPE
   
   
   #Initier log
@@ -1339,7 +1342,7 @@ LesFil<-function (filbesk,batchdate=SettKHBatchDate(),globs=FinnGlobs(),dumps=ch
     names(DF)<-gsub("^\\s","",names(DF))
     names(DF)<-gsub("\\s$","",names(DF))
     names(DF)[names(DF)==""]<-paste("C",which(names(DF)==""),sep="")
-    
+    DF$filgruppe <- filbesk$FILGRUPPE
     
     #DEV dette b?r v?re un?dvendig '' skal v?re lest inn som NA
     #DF[DF==""]<-NA
@@ -4296,6 +4299,7 @@ FinnFil<-function(FILID,versjonert=FALSE,batch=NA,ROLLE="",TYP="STABLAORG",IDKOL
   }
   return(list(FT=as.data.table(FT),batch=batch))
 }
+
 
 FinnFilT<-function(...){
   return(FinnFil(...)$FT)
