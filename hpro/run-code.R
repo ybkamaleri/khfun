@@ -139,4 +139,5 @@ db$dbconn %>%
   tbl(sql(sql02))
 
 
-
+db$db_close()
+db$db_connect()
