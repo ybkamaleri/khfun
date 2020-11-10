@@ -1342,7 +1342,12 @@ LesFil<-function (filbesk,batchdate=SettKHBatchDate(),globs=FinnGlobs(),dumps=ch
     names(DF)<-gsub("^\\s","",names(DF))
     names(DF)<-gsub("\\s$","",names(DF))
     names(DF)[names(DF)==""]<-paste("C",which(names(DF)==""),sep="")
+
+    ## These variables are to be use in Stata process (request from Jørgen)
+    ## They will be deleted when Stata RSYNT1 is completed below
     DF$filgruppe <- filbesk$FILGRUPPE
+    DF$delid <- filbesk$DELID
+    DF$tab1_innles <- filbesk$TAB1
     
     #DEV dette b?r v?re un?dvendig '' skal v?re lest inn som NA
     #DF[DF==""]<-NA
@@ -1397,6 +1402,9 @@ LesFil<-function (filbesk,batchdate=SettKHBatchDate(),globs=FinnGlobs(),dumps=ch
       DumpTabell(DF,paste(filbesk$FILGRUPPE,filbesk$KOBLID,"RSYNT1post",sep="_"),globs=globs,format=format)
     }
   }
+
+  ## These are variables only needed in RSYNT1 for Stata
+  DF[c("filgruppe","delid","tab1_innles")] <- NULL
   
   #sink(file=paste(globs$path,"/hoder.txt",sep=""),append=TRUE)
   #cat("\n#################\nFIL: ")
