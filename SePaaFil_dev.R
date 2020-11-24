@@ -45,7 +45,7 @@ trace("LagFilgruppe", tracer = quote(print(as.list(match.call()))),
 
 ## List of Filgruppenavn to check
 ## ------------------------------
-gpnavn <- c("ELEVUNDER", "ARBLEDIGE")
+gpnavn <- c("ELEVUNDER", "ARBLEDIGE", "REGNEFERD_NH", "DODE_GK")
 
 ## Subset file for testing purposes
 gpnavnSub <- c("ELEVUNDER")
@@ -57,9 +57,10 @@ gpnavnSub <- c("ELEVUNDER")
 ## because all connections are closed everytime LagFilgruppe is completed
 KHglobs<-SettGlobs()
 
-
 #Dump i innlesingen
 ## tesfil = TRUE is to choose file where TESTING is 1 in ORGINALFILERse
+LagFilgruppe(gpnavn[4], test = T)
+LagFilgruppe("REGNEFERD_NH", test = TRUE)
 LagFilgruppe("ELEVUNDER") #CSV fil
 LagFilgruppe("ELEVUNDER", test = TRUE) #CSV fil testfile
 LagFilgruppe("INNTULIKHET", test = TRUE) #CSV fil testfile
@@ -70,7 +71,7 @@ LagFilgruppe("SYSVAK", test = TRUE)
 LagFilgruppe("KUHR", test = TRUE)
 LagFilgruppe("ARBLEDIGE", test = TRUE)
 LagFilgruppe("FORSVARET_SESJON1") #har mange Stata kjøring
-
+LagFilgruppe("")
 
 LagFilgruppe(gpnavnSub[1])
 LagFilgruppe(gpnavn[2], testfil = TRUE) #csv
@@ -110,7 +111,7 @@ k <- LagKUBE("SYSVAK_1",dumps=dumps)
 LagKUBE("INNTULIKHET")
 LagKUBE("UFORE", dumps = dumps)
 LagKUBE("ARBLEDIGE")
-
+LagKUBE("REGNEFERD_NH")
 
 #Du kan ogs? lage dump i alle RSYNT-punkter, ved ? legge inn en "lagre fil"-kommando som RSYNT.
 
