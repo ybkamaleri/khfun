@@ -79,11 +79,13 @@ if(runtest) {test = "Ja"} else {test = "Nei"}
 
 ## Path for Database and output
 defpaths <- switch(test,
-                   Nei = c("F:/Prosjekter/Kommunehelsa/PRODUKSJON",
-                           "F:/Prosjekter/Kommunehelsa/PRODUKSJON/DEVELOP",
-                             "F:/Prosjekter/Kommunehelsa/Data og databehandling/kbDEV",
-                             "J:/FHI/PRODUKSJON",
-                             "J:/kbDEV"),
+                   Nei = c(
+                     "F:/Forskningsprosjekter/PDB 2455 - Helseprofiler og til_/PRODUKSJON", 
+                     "f:/Prosjekter/Kommunehelsa/PRODUKSJON_OLD",
+                     "F:/Prosjekter/Kommunehelsa/PRODUKSJON/DEVELOP",
+                     "F:/Prosjekter/Kommunehelsa/Data og databehandling/kbDEV",
+                     "J:/FHI/PRODUKSJON",
+                     "J:/kbDEV"),
                    Ja = "c:/enc/DBtest")
 
 ## Database filename
@@ -92,7 +94,7 @@ filDB <- switch(test,
                 Ja = "KHELSA_dev.mdb")
 
 ## set root for ORIGINAL files when test=TRUE instead of c:/enc/DBtest
-originalPath <- "F:/Prosjekter/Kommunehelsa/PRODUKSJON"
+originalPath <- "F:/Forskningsprosjekter/PDB 2455 - Helseprofiler og til_/PRODUKSJON"
 
 
 ## BIG TROUBLE!!! Watch out when setting up path. Too many 'setwd()' are used!

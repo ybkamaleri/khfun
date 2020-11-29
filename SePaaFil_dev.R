@@ -69,7 +69,8 @@ LagFilgruppe("ENSOMHET_CRUDE_UNGDATA", test = TRUE) # Error in Stata
 LagFilgruppe("SYSVAK", test = TRUE)
 LagFilgruppe("KUHR", test = TRUE)
 LagFilgruppe("ARBLEDIGE")
-
+LagFilgruppe("DODE_GK", test = TRUE)
+LagFilgruppe("ABORT_NH", test = T) #koblid 3256
 
 LagFilgruppe(gpnavnSub[1])
 LagFilgruppe(gpnavn[2], testfil = TRUE) #csv
