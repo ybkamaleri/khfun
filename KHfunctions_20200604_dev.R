@@ -81,9 +81,9 @@ if(runtest) {test = "Ja"} else {test = "Nei"}
 defpaths <- switch(test,
                    Nei = c("F:/Prosjekter/Kommunehelsa/PRODUKSJON",
                            "F:/Prosjekter/Kommunehelsa/PRODUKSJON/DEVELOP",
-                             "F:/Prosjekter/Kommunehelsa/Data og databehandling/kbDEV",
-                             "J:/FHI/PRODUKSJON",
-                             "J:/kbDEV"),
+                           "F:/Prosjekter/Kommunehelsa/Data og databehandling/kbDEV",
+                           "J:/FHI/PRODUKSJON",
+                           "J:/kbDEV"),
                    Ja = "c:/enc/DBtest")
 
 ## Database filename
@@ -92,7 +92,9 @@ filDB <- switch(test,
                 Ja = "KHELSA_dev.mdb")
 
 ## set root for ORIGINAL files when test=TRUE instead of c:/enc/DBtest
-originalPath <- "F:/Prosjekter/Kommunehelsa/PRODUKSJON"
+originalPath <-"F:/Forskningsprosjekter/PDB 2455 - Helseprofiler og til_/PRODUKSJON"
+
+## "F:/Prosjekter/Kommunehelsa/PRODUKSJON"
 
 
 ## BIG TROUBLE!!! Watch out when setting up path. Too many 'setwd()' are used!
@@ -232,7 +234,7 @@ SettDefDesignKH<-function(globs=FinnGlobs()){
          AggVedStand=AggVedStand,
          IntervallHull=IntervallHull,
          AMissAllow=TRUE
-    )
+         )
   )
 }
 
@@ -385,7 +387,7 @@ SettGlobs<-function(path="",modus=NA,gibeskjed=FALSE) {
   #Disse er faste over hver kjøring og endres normalt bare ved systemoppdatering/-migrering
   #Merk at globs$dbh ikke lukkes av seg selv, dermed kan det bli rot med gamle slike om FinnGlobs brukes for mye
   #Bruk evy odbcCloseAll() for å rydde absolutt alle 
-    
+  
   #Les globglobs (se topp av fil)
   globs<-globglobs
   if (is.na(modus)){
@@ -410,7 +412,7 @@ SettGlobs<-function(path="",modus=NA,gibeskjed=FALSE) {
   ##--------------------------------------------
   KHdbname<-globs$KHdbname
   #Sett path om denne ikker er oppgitt:
- 
+  
   
   ## Give path where Access database file is if not already given
   ## ------------------------------------------------------------
@@ -758,7 +760,7 @@ LagTabellFraFil<-function (filbesk,FGP,batchdate=SettKHBatchDate(),diagnose=0,gl
   #     filbesk$RSYNT1<-gsub("\\\r","\\\n",filbesk$RSYNT1)
   #     eval(parse(text=filbesk$RSYNT1))
   #   }
-    #cat("\nETTER INNLES\n#############################\n")
+  #cat("\nETTER INNLES\n#############################\n")
   
   
   
@@ -776,7 +778,7 @@ LagTabellFraFil<-function (filbesk,FGP,batchdate=SettKHBatchDate(),diagnose=0,gl
     #Sett standard kolonnenavn
     names(DF)<-mapvalues(names(DF),HarCols,names(HarCols))
     
-   
+    
     
     ######################################################
     
@@ -823,7 +825,7 @@ LagTabellFraFil<-function (filbesk,FGP,batchdate=SettKHBatchDate(),diagnose=0,gl
   }
   
   if (ok==1){
-        
+    
     #Må splitte evt kolonne fra MULTIHEAD
     if (!is.na(filbesk$MULTIHEAD)){
       mhl<-LesMultiHead(filbesk$MULTIHEAD)
@@ -876,7 +878,7 @@ LagTabellFraFil<-function (filbesk,FGP,batchdate=SettKHBatchDate(),diagnose=0,gl
     
     ######################################################
     #Omdøp kolonnenavn, runde 2. 
-      
+    
     #Finn kolonner spesifisert i filbesk
     HarCols<-filbesk[kolorgs[grepl("^[^-<]",filbesk[kolorgs])]]
     HarCols<-HarCols[HarCols %in% names(DF)]
@@ -945,15 +947,15 @@ LagTabellFraFil<-function (filbesk,FGP,batchdate=SettKHBatchDate(),diagnose=0,gl
     setkeyv(DF,tabkols)
     lp<-paste("list(",
               paste(valkols,"=as.character(sum(as.numeric(",valkols,")))",
-              sep="",collapse=","),
+                    sep="",collapse=","),
               ")",sep="")
     DF<-as.data.frame(DF[,eval(parse(text=lp)), by=tabkols])
   }
   
   
- 
   
-   ######################################################
+  
+  ######################################################
   #SKILL EVT UT SOM EGEN FUNKSJON
   #Nullstill logg
   if ("KODEBOKpre" %in% names(dumps)){
@@ -1021,7 +1023,7 @@ LagTabellFraFil<-function (filbesk,FGP,batchdate=SettKHBatchDate(),diagnose=0,gl
       org<-setNames(as.data.frame(table(DF$AAR,useNA="ifany"),stringsAsFactors=FALSE),c("ORG","FREQ"))
       
       aar<-AARvask(org,filbesk=filbesk,batchdate=batchdate,globs=globs)
-        
+      
       SkrivKBLogg(KB=aar,type="AAR",filbesk=filbesk,FGP$FILGRUPPE,batchdate=batchdate,globs=globs)
       TilFilLogg(filbesk$KOBLID,"AAR_ok",ifelse(globs$aar_illeg %in% aar$OMK,0,1),batchdate=batchdate,globs=globs)
       
@@ -1141,7 +1143,7 @@ LagTabellFraFil<-function (filbesk,FGP,batchdate=SettKHBatchDate(),diagnose=0,gl
           valKBut<-rbind(valKBut,valKB)
           
           #if(valok==0){print(valKB)}
-           
+          
           #Internt, regnbart format med numerisk flagg i "VAL1f" etc
           #".." = 1, "." = 2, ":" = 3  
           valKB$kbNUM<-kbNUM
@@ -1162,7 +1164,7 @@ LagTabellFraFil<-function (filbesk,FGP,batchdate=SettKHBatchDate(),diagnose=0,gl
           SkrivKBLogg(KB=valKBut,type=val,filbesk=filbesk,FGP$FILGRUPPE,batchdate=batchdate,globs=globs)
         }
         
-       
+        
         DF[,val]<-NULL
         DF<-setNames(DF,mapvalues(names(DF),valomk,val))
         
@@ -1186,7 +1188,7 @@ LagTabellFraFil<-function (filbesk,FGP,batchdate=SettKHBatchDate(),diagnose=0,gl
     
     
     
-        
+    
     default.stringsAsFactors=TRUE 
     Kols<-c(globs$DefDesign$DesignKolsFA[globs$DefDesign$DesignKolsFA %in% names(DF)],names(DF)[grepl("^VAL\\d+(\\.(f|a)|)$",names(DF))])
     if (echo==TRUE){
@@ -1197,7 +1199,7 @@ LagTabellFraFil<-function (filbesk,FGP,batchdate=SettKHBatchDate(),diagnose=0,gl
     #kAN KRÆSJE VED UKJENT KOLNAVN!
     #print(FGP)
     DF<-DF[,Kols]
-   
+    
     #Kast rader for inaktive GEO med alle VAL==NA (må gjøres fordi alle kommunekoder gir utrapportert tall fra STATBANK og 0/NA er ikke nøytralt for ikke-sumerbare kolonner, jfr MEDIANINNT)
     #Merk at ekte NA settes inn igjen når det rektangulariseres på aktive kommuner ved kubeproduksjon
     GeoFra<-setNames(globs$GeoKoder$FRA,globs$GeoKoder$GEO)
@@ -1222,7 +1224,7 @@ LagTabellFraFil<-function (filbesk,FGP,batchdate=SettKHBatchDate(),diagnose=0,gl
     
     DF$KOBLID<-filbesk$KOBLID
     DF$ROW<-1:nrow(DF)
-        
+    
     TilFilLogg(filbesk$KOBLID,"FINALh",DFHeadToString(DF),batchdate=batchdate,globs=globs)    
   }
   TilFilLogg(filbesk$KOBLID,"TidLagTab",(proc.time()-klokke)[3],batchdate=batchdate,globs=globs)
@@ -1231,7 +1233,7 @@ LagTabellFraFil<-function (filbesk,FGP,batchdate=SettKHBatchDate(),diagnose=0,gl
     SVcloneRecord(globs$log,"INNLES_LOGG",filbesk$KOBLID)
     SVcloneRecord(globs$log,"KODEBOK_LOGG",filbesk$KOBLID)
     #SVcloneRecord(globs$log,"KODEBOK_LOGG",filbesk$KOBLID)
-  
+    
   }
   if (ok==0){
     DF<-data.frame()
